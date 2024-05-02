@@ -14,9 +14,31 @@ namespace LogAnalyzerLibrary
     {
         logDirectories = directories;
     }
+               
 
+        // Count Total available logs in a period
+        public int CountTotalLogs(DateTime startDate, DateTime endDate)
+        {
+            int totalLogs = 0;
 
-        // US-9: Search Logs in directories
+            foreach (string directory in logDirectories)
+            {
+                try
+                {
+                    var logs = Directory.GetFiles(directory, "*", SearchOption.AllDirectories)
+                                        .Where(file => File.GetLastWriteTime(file) >= startDate && File.GetLastWriteTime(file) <= endDate);
+                    totalLogs += logs.Count();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error accessing directory {directory}: {ex.Message}");
+                }
+            }
+
+            return totalLogs;
+        }
+
+        // Search Logs in directories
         public List<string> SearchLogs(string searchPattern)
         {
             List<string> foundLogs = new List<string>();
@@ -35,8 +57,6 @@ namespace LogAnalyzerLibrary
 
             return foundLogs;
         }
-
-        
 
     }
 }
